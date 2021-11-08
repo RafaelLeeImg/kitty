@@ -8,6 +8,9 @@ endif
 ifdef FAIL_WARN
 export FAIL_WARN
 endif
+# A debug build
+debug:
+	python3 setup.py build $(VVAL) --debug
 
 all:
 	python3 setup.py $(VVAL)
@@ -17,10 +20,6 @@ test:
 
 clean:
 	python3 setup.py $(VVAL) clean
-
-# A debug build
-debug:
-	python3 setup.py build $(VVAL) --debug
 
 debug-event-loop:
 	python3 setup.py build $(VVAL) --debug --extra-logging=event-loop

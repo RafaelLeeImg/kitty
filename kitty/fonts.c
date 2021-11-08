@@ -400,6 +400,8 @@ calc_cell_metrics(FontGroup *fg) {
         underline_position += MIN(cell_height - 1, (unsigned)line_height_adjustment / 2);
     }
     sprite_tracker_set_layout(&fg->sprite_tracker, cell_width, cell_height);
+    // cell_width = 11; // minimum width not cause M and W reshape
+    // cell_width = 7;
     fg->cell_width = cell_width; fg->cell_height = cell_height;
     fg->baseline = baseline; fg->underline_position = underline_position; fg->underline_thickness = underline_thickness, fg->strikethrough_position = strikethrough_position, fg->strikethrough_thickness = strikethrough_thickness;
     ensure_canvas_can_fit(fg, 8);
@@ -557,6 +559,13 @@ START_ALLOW_CASE_RANGE
                 case 3:
                     ans = fg->bi_font_idx; break;
             }
+            // if (cpu_cell->ch > 0xff)
+            // {
+            //     printf ("0x%02X, %ld, ",cpu_cell->ch, ans);
+            // }
+            // // printf ("after return ");
+            // printf ("%ld;", ans);
+            // fflush(stdout);
             if (ans < 0) ans = fg->medium_font_idx;
             if (!*is_emoji_presentation && has_cell_text(fg->fonts + ans, cpu_cell)) { *is_main_font = true; return ans; }
             return fallback_font(fg, cpu_cell, gpu_cell);
@@ -1303,6 +1312,26 @@ render_line(FONTS_DATA_HANDLE fg_, Line *line, index_type lnum, Cursor *cursor, 
         bool is_main_font, is_emoji_presentation;
         ssize_t cell_font_idx = font_for_cell(fg, cpu_cell, gpu_cell, &is_main_font, &is_emoji_presentation);
 
+        // if (0!=cpu_cell->ch)
+        // {
+        //     printf ("[%c]0x%02X,", cpu_cell->ch, cpu_cell->ch);
+        // }
+
+        // if ('m'==cpu_cell->ch || 'W' == cpu_cell->ch || 'M'==cpu_cell->ch || 'w'==cpu_cell->ch)
+        // {
+        //     printf (" ");fflush(stdout);
+        // }
+
+        // if ('A'==cpu_cell->ch || 'a'==cpu_cell->ch)
+        // {
+        //     printf (" ");fflush(stdout);
+        // }
+
+        // if ((uint32_t)(cpu_cell->ch) > 127)
+        // {
+        //     printf (" ");fflush(stdout);
+        // }
+
         if (
                 cell_font_idx != MISSING_FONT &&
                 ((!is_main_font && !is_emoji_presentation && is_symbol(cpu_cell->ch)) || (cell_font_idx != BOX_FONT && (is_private_use(cpu_cell->ch))) || is_non_emoji_dingbat(cpu_cell->ch))
@@ -1313,6 +1342,7 @@ render_line(FONTS_DATA_HANDLE fg_, Line *line, index_type lnum, Cursor *cursor, 
                 glyph_index glyph_id = glyph_id_for_codepoint(font->face, cpu_cell->ch);
 
                 int width = get_glyph_width(font->face, glyph_id);
+                // width = 1;
                 desired_cells = (unsigned int)ceilf((float)width / fg->cell_width);
             }
             desired_cells = MIN(desired_cells, cell_cap_for_codepoint(cpu_cell->ch));
@@ -1348,6 +1378,23 @@ render_line(FONTS_DATA_HANDLE fg_, Line *line, index_type lnum, Cursor *cursor, 
         }
         prev_width = gpu_cell->attrs.width;
         if (run_font_idx == NO_FONT) run_font_idx = cell_font_idx;
+
+        // if (0!=cpu_cell->ch)
+        // {
+        //     if (prev_width < 1)
+        //     {
+        //         printf ("(%d)", prev_width);
+        //     }
+        //     else if (prev_width == 1)
+        //     {
+        //         printf ("(1)");
+        //     }
+        //     else
+        //     {printf ("(%d)", prev_width);}
+        //     printf(";\n");
+        //     fflush(stdout);
+        // }
+
         if (run_font_idx == cell_font_idx) continue;
         RENDER
         run_font_idx = cell_font_idx;
@@ -1435,6 +1482,7 @@ send_prerendered_sprites(FontGroup *fg) {
 
 static size_t
 initialize_font(FontGroup *fg, unsigned int desc_idx, const char *ftype) {
+    // printf ("ftype = %s\n", ftype);
     PyObject *d = PyObject_CallFunction(descriptor_for_idx, "I", desc_idx);
     if (d == NULL) { PyErr_Print(); fatal("Failed for %s font", ftype); }
     bool bold = PyObject_IsTrue(PyTuple_GET_ITEM(d, 1));
