@@ -167,9 +167,15 @@ def dump_faces(ftypes: List[str], indices: Dict[str, int]) -> None:
     def face_str(f: Tuple[FontObject, bool, bool]) -> str:
         fo = f[0]
         if 'index' in fo:
-            return '{}:{}'.format(fo['path'], cast('FontConfigPattern', fo)['index'])
+            ret = '{}:{}'.format(fo['path'], cast('FontConfigPattern', fo)['index'])
+            print ('---------------------')
+            print (ret)
+            return ret
         fo = cast('CoreTextFont', fo)
-        return fo['path']
+        ret = fo['path']
+        print ('---------------------')
+        print (ret)
+        return ret
 
     log_error('Preloaded font faces:')
     log_error('normal face:', face_str(current_faces[0]))
@@ -189,6 +195,7 @@ def set_font_family(opts: Optional[Options] = None, override_font_size: Optional
     sz = override_font_size or opts.font_size
     font_map = get_font_files(opts)
     current_faces = [(font_map['medium'], False, False)]
+    print ("current_faces = %s"%current_faces)
     ftypes = 'bold italic bi'.split()
     indices = {k: 0 for k in ftypes}
     for k in ftypes:
