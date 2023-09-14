@@ -165,7 +165,7 @@ on_key_input(GLFWkeyevent *ev) {
             return;
     }
     PyObject *ke = NULL;
-#define create_key_event() { ke = convert_glfw_key_event_to_python(ev); if (!ke) { PyErr_Print(); return; } }
+#define create_key_event(void) { ke = convert_glfw_key_event_to_python(ev); if (!ke) { PyErr_Print(); return; } }
     if (global_state.in_sequence_mode) {
         debug("in sequence mode, handling as shortcut\n");
         if (

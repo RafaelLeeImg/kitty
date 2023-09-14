@@ -13,7 +13,7 @@
 #include <errno.h>
 
 int
-cpu_count() {
+cpu_count(void) {
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
     return sysinfo.dwNumberOfProcessors;

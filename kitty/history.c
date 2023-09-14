@@ -377,7 +377,7 @@ pagerhist_rewrap_to(HistoryBuf *self, index_type cells_in_line) {
     WCSState wcs_state;
     initialize_wcs_state(&wcs_state);
 
-#define WRITE_CHAR() { \
+#define WRITE_CHAR(void) { \
     if (num_in_current_line + ch_width > cells_in_line) { \
         pagerhist_write_bytes(nph, (const uint8_t*)"\r", 1); \
         num_in_current_line = 0; \

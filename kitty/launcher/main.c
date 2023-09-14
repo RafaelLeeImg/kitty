@@ -209,7 +209,7 @@ fail:
 
 #endif
 
-// read_exe_path() {{{
+// read_exe_path(void) {{{
 #ifdef __APPLE__
 static bool
 read_exe_path(char *exe, size_t buf_sz) {

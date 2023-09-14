@@ -123,7 +123,7 @@ new_ec_key(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     }
     EVP_PKEY *key = NULL;
     EVP_PKEY_CTX *pctx = NULL;
-#define cleanup() { if (key) EVP_PKEY_free(key); key = NULL; if (pctx) EVP_PKEY_CTX_free(pctx); pctx = NULL; }
+#define cleanup(void) { if (key) EVP_PKEY_free(key); key = NULL; if (pctx) EVP_PKEY_CTX_free(pctx); pctx = NULL; }
 #define ssl_error(text) { cleanup(); return set_error_from_openssl(text); }
 
     if (NULL == (pctx = EVP_PKEY_CTX_new_id(nid, NULL))) ssl_error("Failed to create context for key generation");
@@ -174,7 +174,7 @@ derive_secret(EllipticCurveKey *self, PyObject *args) {
     EVP_PKEY_CTX *ctx = NULL;
     unsigned char *secret = NULL; size_t secret_len = 0;
     EVP_PKEY *public_key = EVP_PKEY_new_raw_public_key(self->algorithm, NULL, (const unsigned char*)pubkey_raw, pubkey_len);
-#define cleanup() { if (public_key) EVP_PKEY_free(public_key); public_key = NULL; if (ctx) EVP_PKEY_CTX_free(ctx); ctx = NULL; if (secret) OPENSSL_clear_free(secret, secret_len); secret = NULL; }
+#define cleanup(void) { if (public_key) EVP_PKEY_free(public_key); public_key = NULL; if (ctx) EVP_PKEY_CTX_free(ctx); ctx = NULL; if (secret) OPENSSL_clear_free(secret, secret_len); secret = NULL; }
 #define ssl_error(text) { cleanup(); return set_error_from_openssl(text); }
     if (!public_key) ssl_error("Failed to create public key");
 
